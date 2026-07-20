@@ -326,7 +326,11 @@ whole command on one line (no trailing `\`).
 
 ## Cleanup
 
-Run `solutions/09_cleanup.sql` to drop everything.
+Run `solutions/09_cleanup.sql`. Part A drops the lab objects (database, warehouse) and is
+safe to run from CoCo. Part B (dropping `VHOLuser` and its network policy) is optional and
+commented out: CoCo is connected **as** `VHOLuser`, so don't drop it from that connection —
+run those lines from a Snowsight worksheet signed in as your trial's own admin user, or just
+let the trial expire.
 
 ## License
 
