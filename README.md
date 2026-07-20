@@ -216,11 +216,16 @@ by summarizing raw errors with Cortex:
 CoCo builds the agent **object** in Snowflake (it creates a helper procedure and the
 `SNOWMART_SRE` agent). To actually **talk** to it, go to **Snowsight → AI & ML → Agents**,
 click **SNOWMART_SRE**, and use the **agent playground** on its detail page. Ask it, in turn:
-1. Which service has the highest error rate in the last 10 minutes?
-2. What is going wrong with that service? Summarize the errors.
-3. Is anything related affected?
+1. In the last 5 minutes, which services have the highest error rates right now?
+2. Give me the root cause for the single worst service.
+3. Is anything upstream or related affected?
 4. What should I check first?
 5. Draft an incident note I can post to the on-call channel.
+
+These land hardest once the incident is live (Part 7). Keep the window explicit ("in the
+last 5 minutes") so the agent evaluates current conditions. If it keeps naming a service
+from an earlier answer (the baseline worst is usually recommendation-service), re-ask with
+the recent window or start a new conversation so it recomputes against the live data.
 
 **Model note.** The agent has its own brain, set separately from CoCo's model picker (the
 model at the top of CoCo builds the lab; it is not the agent). We default the agent to
@@ -255,8 +260,9 @@ an error burst, exactly what paged you:
 > producer/profile.json --rps 200 --fault checkout_cascade --fault-after 30.
 
 Watch all three surfaces at once: raw errors hit BRONZE_LOGS in seconds, Silver/Gold update
-within a minute, and the dashboard line for checkout-service spikes. Then ask the agent:
-> What changed in the last few minutes?
+within a minute, and the dashboard line for checkout-service spikes. Give Gold a minute to
+aggregate the spike, then ask the agent (in the agent playground):
+> In the last 5 minutes, which service is worst right now, and what is the root cause?
 
 The visual spike and the AI explanation land together — that's the payoff.
 

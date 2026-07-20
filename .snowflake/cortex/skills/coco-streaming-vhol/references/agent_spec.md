@@ -64,7 +64,7 @@ FROM SPECIFICATION $spec$
 {
   "models": { "orchestration": "claude-4-sonnet" },
   "instructions": {
-    "response": "You are an on-call SRE co-pilot for Snowmart, a consumer shopping app. Answer questions about service health using the service_health tool over the semantic view. When a service is degrading, call summarize_service_incident to explain the likely root cause from its recent error logs. Be concise and lead with the affected service, the symptom, and the suspected cause."
+    "response": "You are an on-call SRE co-pilot for Snowmart, a consumer shopping app. Answer questions about service health using the service_health tool over the semantic view. IMPORTANT: every time you are asked which service is worst, highest, or degrading, recompute it fresh from the most recent window (default the last 5 minutes) using the service_health tool. Do NOT reuse a service named earlier in the conversation, because conditions change minute to minute and the worst service can shift. When a service is degrading, call summarize_service_incident for that specific service to explain the likely root cause from its recent error logs. Be concise and lead with the affected service, the symptom, and the suspected cause."
   },
   "tools": [
     {
@@ -165,13 +165,24 @@ QUALIFY ROW_NUMBER() OVER (ORDER BY error_rate DESC, p95_latency_ms DESC) = 1;
 
 ## Expected demo dialogue
 
-1. "Which service has the highest error rate in the last 10 minutes?" -> payment-service / checkout-service.
-2. "What is going wrong with checkout-service?" -> summary citing downstream payment-service 503s / timeouts.
-3. "Is anything related affected?" -> cart-service and checkout-service correlated on payment.
+Ask these AFTER the incident is injected (Part 7). Keep the prompts time-bounded to the
+last few minutes so the agent evaluates the current incident, not the earlier baseline.
+
+1. "Look at all services over the last 5 minutes: which have the highest error rates right now?" -> checkout-service / payment-service.
+2. "Give me the root cause for the single worst service." -> summary citing downstream payment-service 503s / timeouts.
+3. "Is anything upstream or related affected?" -> cart-service and checkout-service correlated on payment.
 4. "What should I check first?" -> payment-service latency and any recent deploy.
-5. "Draft an incident note for the on-call channel." -> short shareable summary.
+5. "Draft an incident note I can post to the on-call channel." -> short shareable summary.
+
+Anchoring tip: if you asked the agent earlier (during the healthy baseline) and it named a
+different service (for example recommendation-service, which is the noisiest at baseline),
+it may keep referring to that service. Re-ask with an explicit recent window ("in the last
+5 minutes, which service is worst right now?"), or start a new conversation, so it recomputes
+against the current incident. The agent's response instruction tells it to recompute every
+time, but a tight time window makes it unambiguous.
 
 The Log Data Producer fault (`checkout_cascade`) is built so these answers are
 truthful: payment-service times out (504 / circuit breaker), checkout-service logs
 "downstream payment-service call failed", cart-service takes a mild hit, others stay
-healthy.
+healthy. For a clean demo, run the producer healthy for a few minutes first so the
+baseline is quiet, THEN inject the fault, so checkout/payment clearly become the worst.
