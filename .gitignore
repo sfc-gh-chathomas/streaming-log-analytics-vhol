@@ -1,0 +1,17 @@
+# Secrets and local config — never commit
+secret.pat
+producer/profile.json
+*.p8
+*.pem
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+_sfquery.py
+_probe_models.py
+
+# Facilitator-only materials — kept local, not published to the attendee repo
+outline.md
+script.md
+rehearsal.md

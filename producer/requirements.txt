@@ -1,0 +1,2 @@
+# Snowpipe Streaming SDK for the Log Data Producer
+snowpipe-streaming
