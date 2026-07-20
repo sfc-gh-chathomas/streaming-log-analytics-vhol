@@ -93,10 +93,24 @@ and the producer uses the same PAT. One identity for everything.
    connection manager and add a new connection:
    - **Account identifier:** your trial's `ORG-ACCOUNT`
    - **User:** `VHOLuser`
-   - **Auth:** Programmatic Access Token — paste the `vhol_pat` token from step 2
+   - **Auth:** paste the `vhol_pat` token from step 2. If the wizard lists **Programmatic
+     Access Token**, use that. If it doesn't (some CoCo Desktop versions only show
+     Password / Key Pair / External Browser), choose **Password** and paste the PAT into
+     the **password** field — a PAT is a drop-in replacement for a password in Snowflake
+     drivers, and it skips MFA.
 
    Select it so it becomes the **active** connection. That's all you need — CoCo Desktop
    uses the active connection for both running SQL and the agent's Cortex inference.
+
+   Alternatively, if you'd rather not use the wizard, add the connection directly to
+   `~/.snowflake/connections.toml` and CoCo will list it:
+   ```toml
+   [connections.vhol]
+   account = "ORG-ACCOUNT"
+   user = "VHOLuser"
+   authenticator = "PROGRAMMATIC_ACCESS_TOKEN"
+   token = "<paste vhol_pat>"
+   ```
 5. **Pick the model.** In the model selector, use the **latest Claude Sonnet (Sonnet 5
    preferred)** or the **latest Claude Opus**; fall back to the **latest GPT** (e.g.,
    `openai-gpt-5`) if no Claude is available. The picker only lists models your account
