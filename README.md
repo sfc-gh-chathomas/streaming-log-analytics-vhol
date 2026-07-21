@@ -258,17 +258,19 @@ by summarizing raw errors with Cortex:
 
 CoCo builds the agent **object** in Snowflake (it creates a helper procedure and the
 `SNOWMART_SRE` agent). To actually **talk** to it, go to **Snowsight → AI & ML → Agents**,
-click **SNOWMART_SRE**, and use the **agent playground** on its detail page. Ask it, in turn:
-1. In the last 5 minutes, which services have the highest error rates right now?
-2. Give me the root cause for the single worst service.
-3. Is anything upstream or related affected?
-4. What should I check first?
-5. Draft an incident note I can post to the on-call channel.
+click **SNOWMART_SRE**, and use the **agent playground** on its detail page. Right now
+traffic is healthy, so start with baseline questions to confirm the agent can read the live
+data and speak in service terms. Ask it, in turn:
+1. Which services are you monitoring for Snowmart?
+2. In the last 5 minutes, what is the error rate and p95 latency for each service?
+3. Which service has the highest error rate right now, and is that within a normal range?
+4. Show me the request volume by service over the last few minutes.
 
-These land hardest once the incident is live (Part 7). Keep the window explicit ("in the
-last 5 minutes") so the agent evaluates current conditions. If it keeps naming a service
-from an earlier answer (the baseline worst is usually recommendation-service), re-ask with
-the recent window or start a new conversation so it recomputes against the live data.
+These establish a baseline. The real payoff is the incident triage in Part 7, once a fault is
+live. Keep the window explicit ("in the last 5 minutes") so the agent evaluates current
+conditions. If it keeps naming a service from an earlier answer (the baseline worst is usually
+recommendation-service), re-ask with the recent window or start a new conversation so it
+recomputes against the live data.
 
 **Model note.** The agent has its own brain, set separately from CoCo's model picker (the
 model at the top of CoCo builds the lab; it is not the agent). We set the agent's
@@ -306,10 +308,16 @@ an error burst, exactly what paged you:
 
 Watch all three surfaces at once: raw errors hit BRONZE_LOGS in seconds, Silver/Gold update
 within a minute, and the dashboard line for checkout-service spikes. Give Gold a minute to
-aggregate the spike, then ask the agent (in the agent playground):
-> In the last 5 minutes, which service is worst right now, and what is the root cause?
+aggregate the spike, then walk the agent through triage in the agent playground, in turn:
+1. In the last 5 minutes, which service is worst right now?
+2. Give me the root cause for that single worst service.
+3. Is anything upstream or related affected?
+4. What should I check first to mitigate?
+5. Draft an RCA report I can post to the on-call channel: summary, impact, timeline,
+   suspected root cause, and next steps.
 
-The visual spike and the AI explanation land together. That is the payoff.
+The visual spike and the AI explanation land together, and you finish with a written RCA on
+data that is seconds old. That is the payoff.
 
 ## How the skill knows all this
 

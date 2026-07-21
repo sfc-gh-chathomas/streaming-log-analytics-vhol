@@ -166,16 +166,29 @@ WHERE minute_bucket >= DATEADD('minute', -10, CURRENT_TIMESTAMP())
 QUALIFY ROW_NUMBER() OVER (ORDER BY error_rate DESC, p95_latency_ms DESC) = 1;
 ```
 
-## Expected demo dialogue
+## Baseline dialogue (before the fault, Part 5)
 
-Ask these AFTER the incident is injected (Part 7). Keep the prompts time-bounded to the
-last few minutes so the agent evaluates the current incident, not the earlier baseline.
+Right after the agent is built, traffic is healthy and there is no incident yet, so ask
+orientation questions that just prove the agent reads the live data and speaks in service
+terms. Do NOT ask for a root cause or an incident report here: there is nothing wrong yet.
 
-1. "Look at all services over the last 5 minutes: which have the highest error rates right now?" -> checkout-service / payment-service.
+1. "Which services are you monitoring for Snowmart?" -> lists the services from the semantic view.
+2. "In the last 5 minutes, what is the error rate and p95 latency for each service?" -> a per-service table.
+3. "Which service has the highest error rate right now, and is that within a normal range?" -> usually recommendation-service at a low baseline rate.
+4. "Show me the request volume by service over the last few minutes." -> per-service counts.
+
+## Incident dialogue (after the fault, Part 7)
+
+Ask these AFTER the incident is injected (Part 7). This is the troubleshoot-then-report arc:
+find the worst service, get root cause, check blast radius, then draft the RCA. Keep the
+prompts time-bounded to the last few minutes so the agent evaluates the current incident, not
+the earlier baseline.
+
+1. "In the last 5 minutes, which service is worst right now?" -> checkout-service / payment-service.
 2. "Give me the root cause for the single worst service." -> summary citing downstream payment-service 503s / timeouts.
 3. "Is anything upstream or related affected?" -> cart-service and checkout-service correlated on payment.
-4. "What should I check first?" -> payment-service latency and any recent deploy.
-5. "Draft an incident note I can post to the on-call channel." -> short shareable summary.
+4. "What should I check first to mitigate?" -> payment-service latency and any recent deploy.
+5. "Draft an RCA report I can post to the on-call channel: summary, impact, timeline, suspected root cause, and next steps." -> a short shareable incident writeup.
 
 Anchoring tip: if you asked the agent earlier (during the healthy baseline) and it named a
 different service (for example recommendation-service, which is the noisiest at baseline),
