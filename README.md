@@ -140,11 +140,15 @@ CoCo sets up the producer for you, using the `secret.pat` you saved during boots
 (step 2), so the token never appears in chat.
 
 7. **Set up the producer environment.** Prompt CoCo:
-   > Detect my operating system, then create a Python virtual environment named .venv in the repo root and install the Log Data Producer dependencies from producer/requirements.txt into it. Use the correct interpreter path for my OS (.venv/bin on macOS/Linux, .venv\Scripts on Windows). On macOS, Homebrew Python is externally managed, so a venv is required.
+   > Set up the Log Data Producer environment: create the .venv and install its dependencies.
+
+   (The `coco-streaming-vhol` skill tells CoCo the rest — detect your OS, use the right venv
+   interpreter path, and why macOS needs a venv.)
 8. **Create your streaming profile.** Prompt CoCo:
-   > Create producer/profile.json for the Snowpipe Streaming SDK: use my active connection's
-   > account and user VHOLuser with authorization_type PAT, and fill personal_access_token by
-   > reading secret.pat (repo root) with a shell command so the token is never printed in chat.
+   > Create the Log Data Producer streaming profile from my active connection and secret.pat.
+
+   (The skill knows the format: account + VHOLuser, PAT auth, and to read `secret.pat` in a
+   shell command so the token never appears in chat.)
 
 ## Run the lab
 
