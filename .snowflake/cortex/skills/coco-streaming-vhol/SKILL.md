@@ -147,11 +147,20 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
    AGENT ... FROM SPECIFICATION $spec$ ... $spec$` statement as-is. Do NOT use `uv` or a
    helper script. The procedure `identifier` in `tool_resources` must be a bare FQN with
    NO argument types (`STREAMING_HOL.LOGS.SUMMARIZE_SERVICE_INCIDENT`, not
-   `...(VARCHAR)`). If a SQL tool rejects the `$spec$` body, run the statement in a
-   Snowsight worksheet rather than splitting or re-quoting it. After creating it, tell
-   the attendee to chat with the agent in **Snowsight -> AI & ML -> Agents ->
-   SNOWMART_SRE -> agent playground** (not in CoCo Desktop). The agent's orchestration
-   model defaults to `claude-4-sonnet` and can be changed in that Agents UI.
+   `...(VARCHAR)`). Set `models.orchestration` to `"auto"`: agent orchestration has a
+   restricted, account-specific allowed-models list, so a pinned model like
+   `claude-4-sonnet` can fail with "not an allowed model for Agent". Include both
+   `instructions.response` (tone/style) and `instructions.orchestration` (tool routing +
+   the recompute-worst-service-from-recent-window rule) so the agent has core behavior and
+   response style configured. **To fix or change the agent, re-run the full
+   `CREATE OR REPLACE AGENT ... FROM SPECIFICATION` statement (a clean recreate). Do NOT use
+   a workspace-file edit/redeploy path** (it fails with "Could not resolve workspace file ...
+   cortex-project.yaml" because this agent is created from SQL, not tracked in a workspace).
+   If a SQL tool rejects the `$spec$` body, run the statement in a Snowsight worksheet rather
+   than splitting or re-quoting it. After creating it, tell the attendee to chat with the
+   agent in **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE -> agent playground** (not in
+   CoCo Desktop). To pin a specific model such as Sonnet 5, use that Agents Orchestration
+   dropdown, which lists the allowed models.
 6. **Dashboard** — build the Streamlit app (see references/dashboard_spec.md).
 
 ## Checkpoints
@@ -159,8 +168,8 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
 - **B (bronze freshness):**
   `SELECT PAYLOAD, DATEDIFF('second', TO_TIMESTAMP_TZ(PAYLOAD:ts::string), CURRENT_TIMESTAMP()) AS seconds_ago FROM BRONZE_LOGS ORDER BY TO_TIMESTAMP_TZ(PAYLOAD:ts::string) DESC LIMIT 10;`
   Show the raw JSON `PAYLOAD` column (not parsed fields) so the room sees raw logs landing,
-  plus `seconds_ago`. Expect rows landing within seconds. (Uses payload event time, not
-  LANDED_TS, which Snowpipe Streaming does not reliably populate.)
+  plus `seconds_ago`. Expect rows landing within seconds. (Uses the payload event time, which
+  measures true produce-to-queryable latency.)
 - **S (silver):** `SELECT COUNT(*), COUNT(DISTINCT event_id) FROM SILVER_LOGS;`
   Counts equal (deduped); no HEARTBEAT rows.
 - **G (gold):** `SELECT * FROM GOLD_SERVICE_HEALTH ORDER BY minute_bucket DESC LIMIT 20;`
