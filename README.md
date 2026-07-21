@@ -6,6 +6,10 @@ real time, then refine them with Dynamic Tables, serve them low-latency, and put
 co-pilot and a live dashboard on the live data. Streaming ingestion is the engine underneath
 it all. You build it by prompting CoCo (Cortex Code), not by pasting SQL.
 
+<p align="center">
+  <img src="docs/architecture.svg" alt="Snowmart services stream into BRONZE_LOGS via Snowpipe Streaming; Dynamic Tables refine to SILVER_LOGS then GOLD_SERVICE_HEALTH; an Interactive Table (SERVICE_HEALTH_SERVING) serves the SNOWMART_SRE agent and a Streamlit dashboard" width="420">
+</p>
+
 ## What you need
 
 - A Snowflake trial account (you will be ACCOUNTADMIN). **Create it on AWS in the
@@ -22,6 +26,7 @@ README.md       this file: setup plus the full lab walkthrough
 producer/       Log Data Producer (Snowpipe Streaming) + requirements
 solutions/      SQL answer key (bootstrap + backups + cleanup)
 dashboard/      Streamlit in Snowflake dashboard
+docs/           architecture diagram
 .snowflake/cortex/skills/coco-streaming-vhol/   the VHOL skill (auto-loads in CoCo)
 ```
 
