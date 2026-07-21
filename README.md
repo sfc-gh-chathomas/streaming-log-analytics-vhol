@@ -152,10 +152,13 @@ More on Snowpipe Streaming: https://docs.snowflake.com/en/user-guide/snowpipe-st
    (The `coco-streaming-vhol` skill tells CoCo the rest: detect your OS, use the right venv
    interpreter path, and why macOS needs a venv.)
 8. **Create your streaming profile.** Prompt CoCo:
-   > Create the Log Data Producer streaming profile from my active connection and secret.pat.
+   > Create the Log Data Producer streaming profile: query Snowflake for my account identifier
+   > and user, then fill the token from secret.pat.
 
-   (The skill knows the format: account + VHOLuser, PAT auth, and to read `secret.pat` in a
-   shell command so the token never appears in chat.)
+   (The skill knows the format and derives account + user from a SQL query on your active
+   Snowflake connection, not from the CLI's default connection, so it matches the VHOLuser
+   trial you connected. It reads `secret.pat` in a shell command so the token never appears
+   in chat.)
 
 ## Run the lab
 
