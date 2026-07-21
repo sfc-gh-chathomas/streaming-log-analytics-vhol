@@ -4,7 +4,15 @@
 -- PAT, which CoCo Desktop and the producer authenticate with. CoCo can't
 -- create its own login, so this must run first. Everything else — database,
 -- schema, warehouse, tables — you build by prompting CoCo (see the README walkthrough).
+--
+-- HOW TO RUN: highlight one block and run it (Cmd/Ctrl+Enter).
+--   BLOCK 1 — identity + PAT. Run it, then copy the PAT into your secret.pat.
+--   BLOCK 2 — print your account identifier for the CoCo connection.
 -- =====================================================================
+
+
+-- ============================ BLOCK 1: identity + PAT ============================
+-- Highlight from USE ROLE down to the ADD PROGRAMMATIC ACCESS TOKEN statement and run.
 USE ROLE ACCOUNTADMIN;
 
 -- Standardize on UTC so the producer's event times (UTC) and CURRENT_TIMESTAMP()
@@ -27,19 +35,20 @@ ALTER USER VHOLuser
     ROLE_RESTRICTION = 'ACCOUNTADMIN'
     DAYS_TO_EXPIRY = 7
     COMMENT = 'Streaming VHOL lab token';
--- >>> Copy the token_secret value now (shown once). <<<
+-- >>> Copy the token_secret value now (shown once) into your secret.pat file. <<<
 
--- The account identifier for CoCo. Paste this ONE value into CoCo Desktop's
--- "Account identifier" field (step 4). It is the org-account form (e.g. MYORG-MYACCT).
+
+-- ============================ BLOCK 2: account identifier ============================
+-- Highlight and run this one line. Paste the value into CoCo Desktop's "Account
+-- identifier" field (step 4). It is the org-account form (e.g. MYORG-MYACCT).
 SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier;
 -- >>> Copy account_identifier. <<<
 
--- =====================================================================
--- OPTIONAL teardown (run later). Removes the lab identity and its access.
--- Run these from Snowsight as your signup admin, NOT from CoCo — CoCo is
--- connected AS VHOLuser, so it cannot drop the user it is authenticated with.
--- Lab objects (database, warehouse) are dropped separately in 09_cleanup.sql.
--- =====================================================================
+
+-- ============================ OPTIONAL: teardown (run later) ============================
+-- Removes the lab identity and its access. Run these from Snowsight as your signup
+-- admin, NOT from CoCo — CoCo is connected AS VHOLuser, so it cannot drop the user
+-- it is authenticated with. Lab objects (database, warehouse) are dropped in 09_cleanup.sql.
 -- ALTER USER VHOLuser REMOVE PROGRAMMATIC ACCESS TOKEN vhol_pat;  -- revoke just the token
 -- DROP USER IF EXISTS VHOLuser;                                   -- remove the user and its access
 -- DROP NETWORK POLICY IF EXISTS vhol_np;                          -- remove the network policy

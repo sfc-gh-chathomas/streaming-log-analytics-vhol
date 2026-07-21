@@ -45,16 +45,20 @@ and the producer uses the same PAT. One identity for everything.
 ### B. Bootstrap the account (Snowsight)
 
 2. Log in to your trial in **Snowsight as your signup user** (you are ACCOUNTADMIN) and
-   run the SQL below once in a worksheet (identical to `solutions/00_bootstrap.sql`). It
-   sets the account to UTC and creates the lab user `VHOLuser`, its network policy, and
-   its PAT `vhol_pat`. The database, schema, warehouse, and tables are built later by
-   prompting CoCo (Part 1). **Copy the `token_secret` from the results grid — it is shown
-   only once.** Save it as the **only contents** of a file named `secret.pat` in the **repo
-   root** you cloned in step 1 (gitignored). You'll paste this same token into the CoCo
-   connection (step 4), and CoCo reads `secret.pat` when it builds the producer profile.
-   The last statement also prints your **`account_identifier`** — copy that too; you'll need
-   it for the CoCo connection (step 4) and the producer.
+   run the SQL below in a worksheet (identical to `solutions/00_bootstrap.sql`). It's split
+   into two blocks you run one at a time — **highlight a block and press Cmd/Ctrl+Enter**:
+   - **Block 1 (identity + PAT):** creates the lab user `VHOLuser`, its network policy, and
+     its PAT `vhol_pat`, and sets the account to UTC. **Copy the `token_secret` from the
+     results grid — it is shown only once** — and save it as the **only contents** of a file
+     named `secret.pat` in the **repo root** you cloned in step 1 (gitignored). You'll paste
+     this token into the CoCo connection (step 4), and CoCo reads `secret.pat` when it builds
+     the producer profile.
+   - **Block 2 (account identifier):** prints your **`account_identifier`**. Copy it; you'll
+     paste it into the CoCo connection (step 4).
+
+   The database, schema, warehouse, and tables are built later by prompting CoCo (Part 1).
    ```sql
+   -- ===== BLOCK 1: identity + PAT (run this, then copy the PAT into secret.pat) =====
    USE ROLE ACCOUNTADMIN;
 
    -- Standardize on UTC so the producer's event times (UTC) and CURRENT_TIMESTAMP()
@@ -77,9 +81,9 @@ and the producer uses the same PAT. One identity for everything.
        ROLE_RESTRICTION = 'ACCOUNTADMIN'
        DAYS_TO_EXPIRY = 7
        COMMENT = 'Streaming VHOL lab token';
-   -- >>> Copy the token_secret value now (shown once). <<<
+   -- >>> Copy the token_secret value now (shown once) into secret.pat. <<<
 
-   -- The account identifier for CoCo. Paste this ONE value into CoCo's Account field (step 4).
+   -- ===== BLOCK 2: account identifier (run this, then copy the value into CoCo) =====
    SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier;
    -- >>> Copy account_identifier (e.g. MYORG-MYACCT). <<<
 
