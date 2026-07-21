@@ -43,14 +43,16 @@ END;
 $$;
 
 -- ---------------------------------------------------------------------
--- 2) The agent. Dollar-quote the spec with $spec$ and run as one statement.
+-- 2) The agent. Dollar-quote the spec with $$ and run as one statement.
+--    Use $$ (not a named tag like $spec$): CoCo's SQL execution path rejects
+--    named dollar-quote tags, and the spec JSON never contains $$ so it is safe.
 --    NOTE: the procedure identifier is a BARE FQN with NO argument types.
 --    "...SUMMARIZE_SERVICE_INCIDENT(VARCHAR)" fails with "Unknown user-defined function".
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE AGENT SNOWMART_SRE
   WITH PROFILE = '{"display_name": "Snowmart SRE Co-Pilot"}'
   COMMENT = 'On-call SRE co-pilot for Snowmart service health'
-FROM SPECIFICATION $spec$
+FROM SPECIFICATION $$
 {
   "models": { "orchestration": "auto" },
   "instructions": {
@@ -95,7 +97,7 @@ FROM SPECIFICATION $spec$
     }
   }
 }
-$spec$;
+$$;
 
 -- Quick smoke test of the procedure (optional):
 --   CALL SUMMARIZE_SERVICE_INCIDENT('checkout-service');

@@ -258,19 +258,15 @@ by summarizing raw errors with Cortex:
 
 CoCo builds the agent **object** in Snowflake (it creates a helper procedure and the
 `SNOWMART_SRE` agent). To actually **talk** to it, go to **Snowsight → AI & ML → Agents**,
-click **SNOWMART_SRE**, and use the **agent playground** on its detail page. Right now
-traffic is healthy, so start with baseline questions to confirm the agent can read the live
-data and speak in service terms. Ask it, in turn:
-1. Which services are you monitoring for Snowmart?
-2. In the last 5 minutes, what is the error rate and p95 latency for each service?
-3. Which service has the highest error rate right now, and is that within a normal range?
-4. Show me the request volume by service over the last few minutes.
+click **SNOWMART_SRE**, and use the **agent playground** on its detail page. Traffic is still
+healthy here, so ask one baseline question to confirm the agent can read the live stream and
+speak in service terms:
+> In the last 5 minutes, what is the error rate and p95 latency for each service?
 
-These establish a baseline. The real payoff is the incident triage in Part 7, once a fault is
-live. Keep the window explicit ("in the last 5 minutes") so the agent evaluates current
-conditions. If it keeps naming a service from an earlier answer (the baseline worst is usually
-recommendation-service), re-ask with the recent window or start a new conversation so it
-recomputes against the live data.
+You should get a per-service table straight off the live data. That is all you need here. The
+real payoff is the incident triage in Part 7, once a fault is live. Keep the window explicit
+("in the last 5 minutes") so the agent evaluates current conditions rather than anchoring on
+an earlier answer.
 
 **Model note.** The agent has its own brain, set separately from CoCo's model picker (the
 model at the top of CoCo builds the lab; it is not the agent). We set the agent's

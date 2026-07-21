@@ -54,13 +54,15 @@ them as column names.
 ## Step 2: create the agent (exact spec)
 
 Create the agent with SQL. Run this statement as-is; do NOT reach for a helper
-script or `uv`. The spec is dollar-quoted with `$spec$`.
+script or `uv`. Dollar-quote the spec with `$$` (not a named tag like `$spec$`):
+CoCo's SQL execution path rejects named dollar-quote tags, and the spec JSON never
+contains `$$`, so `$$` is both compatible and safe.
 
 ```sql
 CREATE OR REPLACE AGENT STREAMING_HOL.LOGS.SNOWMART_SRE
   WITH PROFILE = '{"display_name": "Snowmart SRE Co-Pilot"}'
   COMMENT = 'On-call SRE co-pilot for Snowmart service health'
-FROM SPECIFICATION $spec$
+FROM SPECIFICATION $$
 {
   "models": { "orchestration": "auto" },
   "instructions": {
@@ -105,7 +107,7 @@ FROM SPECIFICATION $spec$
     }
   }
 }
-$spec$;
+$$;
 ```
 
 ### Two things that trip up agent creation (get them right the first time)
@@ -115,10 +117,12 @@ $spec$;
    Do NOT append the signature (for example
    `"...SUMMARIZE_SERVICE_INCIDENT(VARCHAR)"`); the runtime quotes the whole string
    as one identifier and fails with "Unknown user-defined function".
-2. **Dollar-quote the spec with `$spec$`, run it as one SQL statement.** Keep the
-   `CREATE OR REPLACE AGENT ... FROM SPECIFICATION $spec$ ... $spec$` form. If a SQL
-   tool rejects the dollar-quoted body, run the statement directly in a Snowsight
-   worksheet rather than splitting or re-quoting it.
+2. **Dollar-quote the spec with `$$`, run it as one SQL statement.** Keep the
+   `CREATE OR REPLACE AGENT ... FROM SPECIFICATION $$ ... $$` form. Do NOT use a named
+   tag like `$spec$`: CoCo's SQL execution path rejects named dollar-quote tags (it
+   errors with `unexpected '$spec'`), while `$$` runs cleanly, and the spec JSON never
+   contains `$$`. If any tool still rejects the body, run the statement directly in a
+   Snowsight worksheet rather than splitting or re-quoting it.
 
 ## Tone / instructions
 
@@ -168,14 +172,14 @@ QUALIFY ROW_NUMBER() OVER (ORDER BY error_rate DESC, p95_latency_ms DESC) = 1;
 
 ## Baseline dialogue (before the fault, Part 5)
 
-Right after the agent is built, traffic is healthy and there is no incident yet, so ask
-orientation questions that just prove the agent reads the live data and speaks in service
-terms. Do NOT ask for a root cause or an incident report here: there is nothing wrong yet.
+Right after the agent is built, traffic is healthy and there is no incident yet, so ask a
+single orientation question that just proves the agent reads the live data and speaks in
+service terms. Do NOT ask for a root cause or an incident report here: there is nothing wrong
+yet. One question is enough:
 
-1. "Which services are you monitoring for Snowmart?" -> lists the services from the semantic view.
-2. "In the last 5 minutes, what is the error rate and p95 latency for each service?" -> a per-service table.
-3. "Which service has the highest error rate right now, and is that within a normal range?" -> usually recommendation-service at a low baseline rate.
-4. "Show me the request volume by service over the last few minutes." -> per-service counts.
+- "In the last 5 minutes, what is the error rate and p95 latency for each service?" -> a
+  per-service table off the live stream (usually recommendation-service highest at a low
+  baseline rate). Save the multi-question triage for Part 7.
 
 ## Incident dialogue (after the fault, Part 7)
 

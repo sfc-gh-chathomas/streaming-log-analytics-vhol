@@ -144,20 +144,22 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
    `CREATE INTERACTIVE TABLE` (never `DYNAMIC TABLE ... IS_INTERACTIVE`).
 5. **Agent** — build the SRE co-pilot exactly as in `references/agent_spec.md`: first
    create the `SUMMARIZE_SERVICE_INCIDENT` procedure, then run the `CREATE OR REPLACE
-   AGENT ... FROM SPECIFICATION $spec$ ... $spec$` statement as-is. Do NOT use `uv` or a
-   helper script. The procedure `identifier` in `tool_resources` must be a bare FQN with
-   NO argument types (`STREAMING_HOL.LOGS.SUMMARIZE_SERVICE_INCIDENT`, not
-   `...(VARCHAR)`). Set `models.orchestration` to `"auto"`: agent orchestration has a
-   restricted, account-specific allowed-models list, so a pinned model like
-   `claude-4-sonnet` can fail with "not an allowed model for Agent". Include both
-   `instructions.response` (tone/style) and `instructions.orchestration` (tool routing +
-   the recompute-worst-service-from-recent-window rule) so the agent has core behavior and
+   AGENT ... FROM SPECIFICATION $$ ... $$` statement as-is. Do NOT use `uv` or a
+   helper script. Dollar-quote the spec with `$$`, NOT a named tag like `$spec$`: CoCo's
+   SQL execution path rejects named dollar-quote tags (errors with `unexpected '$spec'`),
+   while `$$` runs cleanly and the spec JSON never contains `$$`. The procedure
+   `identifier` in `tool_resources` must be a bare FQN with NO argument types
+   (`STREAMING_HOL.LOGS.SUMMARIZE_SERVICE_INCIDENT`, not `...(VARCHAR)`). Set
+   `models.orchestration` to `"auto"`: agent orchestration has a restricted,
+   account-specific allowed-models list, so a pinned model like `claude-4-sonnet` can
+   fail with "not an allowed model for Agent". Include both `instructions.response`
+   (tone/style) and `instructions.orchestration` (tool routing + the
+   recompute-worst-service-from-recent-window rule) so the agent has core behavior and
    response style configured. **To fix or change the agent, re-run the full
    `CREATE OR REPLACE AGENT ... FROM SPECIFICATION` statement (a clean recreate). Do NOT use
    a workspace-file edit/redeploy path** (it fails with "Could not resolve workspace file ...
    cortex-project.yaml" because this agent is created from SQL, not tracked in a workspace).
-   If a SQL tool rejects the `$spec$` body, run the statement in a Snowsight worksheet rather
-   than splitting or re-quoting it. After creating it, tell the attendee to chat with the
+   After creating it, tell the attendee to chat with the
    agent in **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE -> agent playground** (not in
    CoCo Desktop). To pin a specific model such as Sonnet 5, use that Agents Orchestration
    dropdown, which lists the allowed models.
