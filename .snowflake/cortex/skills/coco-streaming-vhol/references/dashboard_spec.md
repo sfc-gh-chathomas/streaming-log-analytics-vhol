@@ -95,3 +95,16 @@ runtime. Generate version-safe code:
 > highlighted. Auto-refresh every 5 seconds.
 
 The reference implementation is in the repo at `dashboard/streamlit_app.py`.
+
+## Deploy (no Snowflake CLI)
+
+This is a Streamlit in Snowflake app: there is no `snow` CLI step and no local server. Write
+`dashboard/streamlit_app.py`, then deploy it inside the account one of two ways:
+
+- **SQL:** `CREATE STREAMLIT` (or `CREATE OR REPLACE STREAMLIT`) in `STREAMING_HOL.LOGS`
+  with `QUERY_WAREHOUSE = HOL_WH`, pointing at the app file on a stage.
+- **Snowsight UI:** Projects -> Streamlit -> **+ Streamlit App**, choose `STREAMING_HOL.LOGS`
+  and warehouse `HOL_WH`, and paste the file contents.
+
+The app reads the tables directly via `snowflake.snowpark.context.get_active_session()`, so it
+needs no connection profile or credentials.

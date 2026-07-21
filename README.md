@@ -249,9 +249,9 @@ error rate by service. Now the data speaks the language you use on call.
 
 ### Part 5: Build the SRE co-pilot agent
 
-This is the moment: your pager just fired. Instead of grepping dashboards, you ask an AI
-co-pilot. It answers "what's degrading right now" over the semantic view and explains "why"
-by summarizing raw errors with Cortex:
+Before the incident hits, stand up the co-pilot that will run triage later. You describe it
+in plain English and CoCo builds the agent, grounding it on the semantic view and wiring in a
+Cortex-powered root-cause summarizer:
 > Build an on-call SRE co-pilot agent grounded on the SERVICE_HEALTH_SV semantic view.
 > When a service is degrading, it should also summarize the recent error messages for that
 > service into a plain-English incident note using Cortex.
@@ -263,21 +263,23 @@ healthy here, so ask one baseline question to confirm the agent can read the liv
 speak in service terms:
 > In the last 5 minutes, what is the error rate and p95 latency for each service?
 
-You should get a per-service table straight off the live data. That is all you need here. The
-real payoff is the incident triage in Part 7, once a fault is live. Keep the window explicit
-("in the last 5 minutes") so the agent evaluates current conditions rather than anchoring on
-an earlier answer.
+You should get a per-service table straight off the live data. That confirms the wiring, and
+it is all you need here. Keep the window explicit ("in the last 5 minutes") so the agent
+evaluates current conditions rather than anchoring on an earlier answer. The real payoff,
+worst-service triage and a written incident report, comes in Part 7 once a fault is live.
 
 **Model note.** The agent has its own brain, set separately from CoCo's model picker (the
 model at the top of CoCo builds the lab; it is not the agent). We set the agent's
 orchestration model to `auto` so Snowflake picks a model that's allowed for agents in your
 account (not every model is; pinning one like `claude-4-sonnet` can fail with "not an allowed
-model for Agent"). To pin a specific model such as Sonnet 5, open the agent in Snowsight →
-**Orchestration → Orchestration model** and pick from the dropdown; that dropdown is the
-authoritative per-account list of allowed agent models.
+model for Agent"). To pin a specific model such as Sonnet 5: in Snowsight go to **AI & ML →
+Agents**, open **SNOWMART_SRE**, click **Edit**, select the **Orchestration** section, and
+choose from the **Orchestration model** dropdown (that dropdown is the authoritative
+per-account list of allowed agent models), then **Save**. The Orchestration section only
+appears after you click Edit.
 
-You just went from paged to a written incident hypothesis in a few questions, on data about
-a minute old, without writing a single query.
+The agent is built and reading live data. It has nothing dramatic to report yet, and that is
+the point: you will hand it a real incident in Part 7 and watch it earn its keep.
 
 ### Part 6: Real-time dashboard
 
@@ -288,6 +290,13 @@ becomes honest and visible:
 > SERVICE_HEALTH_SERVING; (2) a live raw log feed from BRONZE_LOGS with how many seconds
 > ago each row landed; (3) error rate and p95 latency per service from
 > SERVICE_HEALTH_SERVING with the worst service highlighted. Auto-refresh every 5 seconds.
+
+This is a **Streamlit in Snowflake** app, so there is no separate server to run and **no
+Snowflake CLI needed**. CoCo writes `dashboard/streamlit_app.py`; deploy it inside your
+account in either way: in **Snowsight → Projects → Streamlit → + Streamlit App** (pick
+`STREAMING_HOL.LOGS` and warehouse `HOL_WH`, then paste the file), or let CoCo create it with
+a `CREATE STREAMLIT` statement. It runs on Snowflake's warehouse and reads the tables directly
+through `get_active_session()`.
 
 **Checkpoint:** the freshness meter shows Bronze at a few seconds (Snowpipe Streaming) while
 Silver/Gold/Serving sit near a minute (the Dynamic Table target lag you chose). That contrast
