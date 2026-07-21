@@ -48,11 +48,12 @@ and the producer uses the same PAT. One identity for everything.
    run the SQL below once in a worksheet (identical to `solutions/00_bootstrap.sql`). It
    sets the account to UTC and creates the lab user `VHOLuser`, its network policy, and
    its PAT `vhol_pat`. The database, schema, warehouse, and tables are built later by
-   prompting CoCo (Part 1). **Copy the `token_secret` from the last statement's results
-   grid — it is shown only once.** Save it as the **only contents** of a file named
-   `secret.pat` in the **repo root** you cloned in step 1 (gitignored). You'll paste this
-   same token into the CoCo connection (step 4), and CoCo reads `secret.pat` when it builds
-   the producer profile.
+   prompting CoCo (Part 1). **Copy the `token_secret` from the results grid — it is shown
+   only once.** Save it as the **only contents** of a file named `secret.pat` in the **repo
+   root** you cloned in step 1 (gitignored). You'll paste this same token into the CoCo
+   connection (step 4), and CoCo reads `secret.pat` when it builds the producer profile.
+   The last statement also prints your **`account_identifier`** — copy that too; you'll need
+   it for the CoCo connection (step 4) and the producer.
    ```sql
    USE ROLE ACCOUNTADMIN;
 
@@ -77,6 +78,12 @@ and the producer uses the same PAT. One identity for everything.
        DAYS_TO_EXPIRY = 7
        COMMENT = 'Streaming VHOL lab token';
    -- >>> Copy the token_secret value now (shown once). <<<
+
+   -- Account identifier for the CoCo connection (step 4) and the producer profile.
+   SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier,
+          CURRENT_ACCOUNT()                                            AS account_locator,
+          CURRENT_REGION()                                             AS region;
+   -- >>> Copy account_identifier (e.g. MYORG-MYACCT). <<<
    -- To revoke later: ALTER USER VHOLuser REMOVE PROGRAMMATIC ACCESS TOKEN vhol_pat;
    ```
 

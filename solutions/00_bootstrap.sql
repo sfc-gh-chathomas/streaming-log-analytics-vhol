@@ -29,6 +29,16 @@ ALTER USER VHOLuser
     COMMENT = 'Streaming VHOL lab token';
 -- >>> Copy the token_secret value now (shown once). <<<
 
+-- Account identifier for the CoCo connection and the producer profile.
+-- Use ACCOUNT_IDENTIFIER (org-account form) in CoCo's "Account identifier" field.
+SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier,
+       CURRENT_ACCOUNT()                                            AS account_locator,
+       CURRENT_ORGANIZATION_NAME()                                  AS org_name,
+       CURRENT_ACCOUNT_NAME()                                       AS account_name,
+       CURRENT_REGION()                                             AS region;
+-- >>> Copy account_identifier (e.g. MYORG-MYACCT); paste it into CoCo (step 4) and
+--     use it for the producer profile URL: https://<account_identifier>.snowflakecomputing.com <<<
+
 -- To revoke this token later without dropping the user:
 --   ALTER USER VHOLuser REMOVE PROGRAMMATIC ACCESS TOKEN vhol_pat;
 -- (List tokens: SHOW USER PROGRAMMATIC ACCESS TOKENS FOR USER VHOLuser;)
