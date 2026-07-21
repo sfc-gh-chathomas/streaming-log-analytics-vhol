@@ -28,7 +28,7 @@ DECLARE
   summary VARCHAR;
 BEGIN
   SELECT SNOWFLAKE.CORTEX.COMPLETE(
-    'claude-4-sonnet',  -- swap for your account's model; see the model note below
+    'claude-sonnet-4-5',  -- swap for your account's model; see the model note below
     'You are an SRE. In 3-4 sentences, summarize the likely incident and root cause '
     || 'from these recent error logs for service ' || :SERVICE_NAME || '. '
     || 'Lead with the symptom and the suspected downstream cause.\n\nLOGS:\n' || logs

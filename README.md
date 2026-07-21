@@ -271,16 +271,11 @@ it is all you need here. Keep the window explicit ("in the last 5 minutes") so t
 evaluates current conditions rather than anchoring on an earlier answer. The real payoff,
 worst-service triage and a written incident report, comes in Part 7 once a fault is live.
 
-**Model note.** The agent has its own brain, set separately from CoCo's model picker (the
-model at the top of CoCo builds the lab; it is not the agent). We set the agent's
-orchestration model to `auto` so Snowflake picks a model that's allowed for agents in your
-account (not every model is; pinning one like `claude-4-sonnet` can fail with "not an allowed
-model for Agent"). To pin a specific model instead: in Snowsight go to **AI & ML →
-Agents**, open **SNOWMART_SRE**, click **Edit**, select the **Orchestration** section, and
-choose from the **Orchestration model** dropdown (that dropdown is the authoritative
-per-account list of allowed agent models), then **Save**. The Orchestration section only
-appears after you click Edit. If you pin one, `claude-sonnet-4-5` works well where it is
-offered; switch back to `auto` if a pinned model is rejected.
+**Model note.** The agent has its own model, separate from CoCo's picker at the top of the
+window (that one builds the lab, not the agent). We leave the agent's orchestration model on
+`auto` so Snowflake picks one that's allowed in your account. To pin a model instead, open the
+agent in Snowsight, click **Edit → Orchestration**, and choose from the dropdown (for example
+`claude-sonnet-4-5`).
 
 The agent is built and reading live data. It has nothing dramatic to report yet, and that is
 the point: you will hand it a real incident in Part 7 and watch it earn its keep.
