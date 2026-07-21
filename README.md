@@ -192,7 +192,7 @@ the background so data keeps landing while you build the next layers:
 > --profile producer/profile.json --rps 200.
 
 Then see how fresh it is:
-> Show me the newest rows landing in BRONZE_LOGS and how many seconds ago each arrived.
+> Show me the newest raw rows landing in BRONZE_LOGS (the raw JSON payload) and how many seconds ago each arrived.
 
 **Checkpoint:** rows land within a few seconds (producer to queryable in about 5s). That is
 Snowpipe Streaming on flat, ingest-based pricing. Learn more:

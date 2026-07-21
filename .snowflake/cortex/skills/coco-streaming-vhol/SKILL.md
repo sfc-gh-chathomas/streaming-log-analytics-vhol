@@ -157,9 +157,10 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
 ## Checkpoints
 
 - **B (bronze freshness):**
-  `SELECT PAYLOAD:service::string AS service, DATEDIFF('second', TO_TIMESTAMP_TZ(PAYLOAD:ts::string), CURRENT_TIMESTAMP()) AS seconds_ago FROM BRONZE_LOGS ORDER BY TO_TIMESTAMP_TZ(PAYLOAD:ts::string) DESC LIMIT 10;`
-  Expect rows landing within seconds. (Uses payload event time, not LANDED_TS, which
-  Snowpipe Streaming does not reliably populate.)
+  `SELECT PAYLOAD, DATEDIFF('second', TO_TIMESTAMP_TZ(PAYLOAD:ts::string), CURRENT_TIMESTAMP()) AS seconds_ago FROM BRONZE_LOGS ORDER BY TO_TIMESTAMP_TZ(PAYLOAD:ts::string) DESC LIMIT 10;`
+  Show the raw JSON `PAYLOAD` column (not parsed fields) so the room sees raw logs landing,
+  plus `seconds_ago`. Expect rows landing within seconds. (Uses payload event time, not
+  LANDED_TS, which Snowpipe Streaming does not reliably populate.)
 - **S (silver):** `SELECT COUNT(*), COUNT(DISTINCT event_id) FROM SILVER_LOGS;`
   Counts equal (deduped); no HEARTBEAT rows.
 - **G (gold):** `SELECT * FROM GOLD_SERVICE_HEALTH ORDER BY minute_bucket DESC LIMIT 20;`
