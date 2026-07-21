@@ -116,11 +116,12 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
      it (`<venv-pip> install -r producer/requirements.txt`). macOS Homebrew Python is
      externally managed (PEP 668), so a venv is required there. Run the producer with
      the venv interpreter (`<venv-python> producer/log_data_producer.py ...`).
-   - **Build `producer/profile.json`:** get `account` and `user` by running SQL on the
-     active connection (the SQL tool uses whatever connection is active in CoCo Desktop):
-     `SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account, CURRENT_USER() AS user;`
-     Do NOT use `snowflake_connections_list` or shell out to the `cortex` CLI for this: those
-     resolve to the CLI's default connection (often a different account, e.g. an internal
+   - **Build `producer/profile.json`:** `user` is always `VHOLuser` (the bootstrap user; the
+     PAT belongs to it), so set it literally, do not query it. Get `account` by running SQL on
+     the active connection (the SQL tool uses whatever connection is active in CoCo Desktop):
+     `SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account;`
+     Do NOT use `snowflake_connections_list` or shell out to the `cortex` CLI for the account:
+     those resolve to the CLI's default connection (often a different account, e.g. an internal
      one), NOT the VHOLuser trial connection active in CoCo Desktop. Derive `url` as
      `https://<account>.snowflakecomputing.com:443`, and write `producer/profile.json`
      matching `producer/profile.example.json` with `authorization_type: "PAT"`. Fill
