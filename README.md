@@ -79,10 +79,8 @@ and the producer uses the same PAT. One identity for everything.
        COMMENT = 'Streaming VHOL lab token';
    -- >>> Copy the token_secret value now (shown once). <<<
 
-   -- Account identifier for the CoCo connection (step 4) and the producer profile.
-   SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier,
-          CURRENT_ACCOUNT()                                            AS account_locator,
-          CURRENT_REGION()                                             AS region;
+   -- The account identifier for CoCo. Paste this ONE value into CoCo's Account field (step 4).
+   SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier;
    -- >>> Copy account_identifier (e.g. MYORG-MYACCT). <<<
    -- To revoke later: ALTER USER VHOLuser REMOVE PROGRAMMATIC ACCESS TOKEN vhol_pat;
    ```
