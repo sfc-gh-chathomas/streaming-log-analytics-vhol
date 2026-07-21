@@ -34,6 +34,13 @@ ALTER USER VHOLuser
 SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier;
 -- >>> Copy account_identifier. <<<
 
--- To revoke this token later without dropping the user:
---   ALTER USER VHOLuser REMOVE PROGRAMMATIC ACCESS TOKEN vhol_pat;
+-- =====================================================================
+-- OPTIONAL teardown (run later). Removes the lab identity and its access.
+-- Run these from Snowsight as your signup admin, NOT from CoCo — CoCo is
+-- connected AS VHOLuser, so it cannot drop the user it is authenticated with.
+-- Lab objects (database, warehouse) are dropped separately in 09_cleanup.sql.
+-- =====================================================================
+-- ALTER USER VHOLuser REMOVE PROGRAMMATIC ACCESS TOKEN vhol_pat;  -- revoke just the token
+-- DROP USER IF EXISTS VHOLuser;                                   -- remove the user and its access
+-- DROP NETWORK POLICY IF EXISTS vhol_np;                          -- remove the network policy
 -- (List tokens: SHOW USER PROGRAMMATIC ACCESS TOKENS FOR USER VHOLuser;)

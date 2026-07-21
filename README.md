@@ -82,7 +82,10 @@ and the producer uses the same PAT. One identity for everything.
    -- The account identifier for CoCo. Paste this ONE value into CoCo's Account field (step 4).
    SELECT CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier;
    -- >>> Copy account_identifier (e.g. MYORG-MYACCT). <<<
-   -- To revoke later: ALTER USER VHOLuser REMOVE PROGRAMMATIC ACCESS TOKEN vhol_pat;
+
+   -- OPTIONAL teardown (later, from Snowsight as your signup admin, NOT from CoCo):
+   -- DROP USER IF EXISTS VHOLuser;           -- remove the lab user and its access
+   -- DROP NETWORK POLICY IF EXISTS vhol_np;  -- remove its network policy
    ```
 
 ### C. Connect CoCo Desktop (as VHOLuser)
