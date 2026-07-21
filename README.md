@@ -125,8 +125,8 @@ and the producer uses the same PAT. One identity for everything.
    ```
 5. **Pick the model.** In the model selector, use the **latest Claude Sonnet (Sonnet 5
    preferred)** or the **latest Claude Opus**; fall back to the **latest GPT** (e.g.,
-   `openai-gpt-5`) if no Claude is available. The picker only lists models your account
-   and region can use, so if it is listed you have access, so do not pick one that is not.
+   `openai-gpt-5`) if no Claude is available. The picker only lists models your account and
+   region can use, so anything shown is fair game.
 6. **Validate the connection and skill.** In CoCo's chat, run:
    > Test my Snowflake connection and make sure the coco-streaming-vhol skill is loaded as part of this lab.
 
@@ -173,11 +173,8 @@ file in `solutions/` is the answer key.
 
 ### Part 1: Connect the producer with Snowpipe Streaming
 
-This is the ingestion foundation of the lab. The Log Data Producer streams Snowmart's service
-logs directly into Snowflake using **Snowpipe Streaming** and its **Python SDK**: it opens a
-streaming channel and appends rows into `BRONZE_LOGS`, which are queryable within seconds (no
-files, no stage, no COPY), on flat, ingest-based pricing. In the real world this producer is
-your log shipper or OTel collector; the only new step is pointing it at Snowflake. First build
+This is the ingestion foundation of the lab. The producer opens a Snowpipe Streaming channel
+and appends Snowmart's service logs into `BRONZE_LOGS`, queryable within seconds. First build
 the landing zone:
 > Set up the lab environment: create database STREAMING_HOL, schema LOGS, a Gen2 XSMALL
 > warehouse HOL_WH, and the raw streaming landing table BRONZE_LOGS (a VARIANT payload
@@ -195,8 +192,7 @@ Then see how fresh it is:
 > Show me the newest raw rows landing in BRONZE_LOGS (the raw JSON payload) and how many seconds ago each arrived.
 
 **Checkpoint:** rows land within a few seconds (producer to queryable in about 5s). That is
-Snowpipe Streaming on flat, ingest-based pricing. Learn more:
-https://docs.snowflake.com/en/user-guide/snowpipe-streaming/data-load-snowpipe-streaming-overview
+Snowpipe Streaming on flat, ingest-based pricing.
 
 ### Part 2: Silver, clean the stream
 
@@ -256,29 +252,26 @@ Cortex-powered root-cause summarizer:
 > When a service is degrading, it should also summarize the recent error messages for that
 > service into a plain-English incident note using Cortex.
 
-CoCo builds the agent **object** in Snowflake (it creates a helper procedure and the
-`SNOWMART_SRE` agent). To actually **talk** to it, go to **Snowsight → AI & ML → Agents** and
-click **SNOWMART_SRE**. Ask your questions in the chat panel on its detail page (the agent
-playground; some versions label it **Preview**). You do **not** need to **Publish** for this
-lab: Publish only matters if you edit the agent in the UI and want to share that version.
-CoCo already created the agent, so just chat with it. Traffic is still
-healthy here, so ask one baseline question to confirm the agent can read the live stream and
-speak in service terms:
+CoCo builds the agent **object** in Snowflake (a helper procedure plus the `SNOWMART_SRE`
+agent). To **talk** to it, go to **Snowsight → AI & ML → Agents → SNOWMART_SRE** and ask your
+questions in the chat panel on its detail page (the agent playground; newer UI labels it
+**Preview**). Use that panel, not the general assistant in Snowsight's right sidebar: the
+sidebar is a separate Snowflake helper that does not know your agent, its tools, or Snowmart's
+services. You do **not** need to **Publish** (that only applies when you edit the agent in the
+UI to share a version). Traffic is still healthy, so ask one baseline question to confirm the
+agent reads the live stream and speaks in service terms:
 > In the last 5 minutes, what is the error rate and p95 latency for each service?
 
-You should get a per-service table straight off the live data. That confirms the wiring, and
-it is all you need here. Keep the window explicit ("in the last 5 minutes") so the agent
-evaluates current conditions rather than anchoring on an earlier answer. The real payoff,
-worst-service triage and a written incident report, comes in Part 7 once a fault is live.
+You should get a per-service table straight off the live data. That confirms the wiring. Keep
+the window explicit ("in the last 5 minutes") so the agent evaluates current conditions. The
+real payoff, worst-service triage and a written incident report, comes in Part 7 once a fault
+is live.
 
 **Model note.** The agent has its own model, separate from CoCo's picker at the top of the
 window (that one builds the lab, not the agent). We leave the agent's orchestration model on
 `auto` so Snowflake picks one that's allowed in your account. To pin a model instead, open the
 agent in Snowsight, click **Edit → Orchestration**, and choose from the dropdown (for example
 `claude-sonnet-4-5`).
-
-The agent is built and reading live data. It has nothing dramatic to report yet, and that is
-the point: you will hand it a real incident in Part 7 and watch it earn its keep.
 
 ### Part 6: Real-time dashboard
 
@@ -312,7 +305,7 @@ an error burst, exactly what paged you:
 
 Watch all three surfaces at once: raw errors hit BRONZE_LOGS in seconds, Silver/Gold update
 within a minute, and the dashboard line for checkout-service spikes. Give Gold a minute to
-aggregate the spike, then walk the agent through triage in the agent playground, in turn:
+aggregate the spike, then walk the agent through triage in the same Preview chat, in turn:
 1. In the last 5 minutes, which service is worst right now?
 2. Give me the root cause for that single worst service.
 3. Is anything upstream or related affected?
