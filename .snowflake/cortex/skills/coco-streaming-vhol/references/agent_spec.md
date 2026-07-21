@@ -147,12 +147,15 @@ database setup, so the Agents playground is the simplest path for the lab.)
 - **Agent orchestration uses a restricted, account-specific allowed-models list that is
   narrower than Cortex COMPLETE.** Pinning a model that is not on it (for example
   `claude-4-sonnet`) fails with "X is not an allowed model for Agent". So set
-  `models.orchestration` to `"auto"` and let Snowflake choose an allowed model. To pin a
-  specific one such as Sonnet 5 in Snowsight: go to **AI & ML -> Agents**, open the agent,
+  `models.orchestration` to `"auto"` (the lab default) and let Snowflake choose an allowed
+  model. To pin one instead in Snowsight: go to **AI & ML -> Agents**, open the agent,
   click **Edit**, select the **Orchestration** section, and pick from the **Orchestration
   model** dropdown, then **Save**. The Orchestration section only appears after you click
   Edit; that dropdown is the authoritative per-account list of allowed agent models. (You can
   also just re-run `CREATE OR REPLACE AGENT` with a different `models.orchestration` value.)
+  If you do pin one, `claude-sonnet-4-5` is a good pick where it is offered. Watch the id:
+  it is `claude-sonnet-4-5`, NOT `claude-4-sonnet` (that reversed string is the one that
+  errors). Fall back to `"auto"` if a pinned model is rejected.
 - **The summarization procedure's `COMPLETE` call is a different check** with its own
   allowed-models list. It needs a concrete model literal (COMPLETE does not accept `auto`).
   Use a model the account offers. Quick check in a worksheet:

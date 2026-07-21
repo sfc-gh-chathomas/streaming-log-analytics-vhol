@@ -161,10 +161,12 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
    cortex-project.yaml" because this agent is created from SQL, not tracked in a workspace).
    After creating it, tell the attendee to chat with the
    agent in **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE -> agent playground** (not in
-   CoCo Desktop). To pin a specific model such as Sonnet 5, open the agent in Snowsight,
+   CoCo Desktop). To pin a specific model, open the agent in Snowsight,
    click **Edit**, select the **Orchestration** section, and choose from the **Orchestration
    model** dropdown (it only appears after Edit); or re-run CREATE OR REPLACE AGENT with a
-   different `models.orchestration`.
+   different `models.orchestration`. If pinning, `claude-sonnet-4-5` is a good pick where
+   offered (mind the id: `claude-sonnet-4-5`, NOT `claude-4-sonnet`); fall back to `auto` if
+   rejected.
 6. **Dashboard** — build the Streamlit app (see references/dashboard_spec.md). This is a
    Streamlit in Snowflake app: NO `snow` CLI and no local server. Write
    `dashboard/streamlit_app.py`, then either create it via `CREATE STREAMLIT` in

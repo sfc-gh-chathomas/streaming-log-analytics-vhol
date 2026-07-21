@@ -272,11 +272,14 @@ worst-service triage and a written incident report, comes in Part 7 once a fault
 model at the top of CoCo builds the lab; it is not the agent). We set the agent's
 orchestration model to `auto` so Snowflake picks a model that's allowed for agents in your
 account (not every model is; pinning one like `claude-4-sonnet` can fail with "not an allowed
-model for Agent"). To pin a specific model such as Sonnet 5: in Snowsight go to **AI & ML →
+model for Agent"). To pin a specific model instead: in Snowsight go to **AI & ML →
 Agents**, open **SNOWMART_SRE**, click **Edit**, select the **Orchestration** section, and
 choose from the **Orchestration model** dropdown (that dropdown is the authoritative
 per-account list of allowed agent models), then **Save**. The Orchestration section only
-appears after you click Edit.
+appears after you click Edit. If you pin one, `claude-sonnet-4-5` is a good choice where it is
+offered; note the id is `claude-sonnet-4-5`, not `claude-4-sonnet` (that string is what
+triggers the "not an allowed model" error). If a pinned model is rejected, switch back to
+`auto`.
 
 The agent is built and reading live data. It has nothing dramatic to report yet, and that is
 the point: you will hand it a real incident in Part 7 and watch it earn its keep.
