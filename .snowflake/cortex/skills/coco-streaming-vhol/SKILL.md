@@ -160,8 +160,10 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
    a workspace-file edit/redeploy path** (it fails with "Could not resolve workspace file ...
    cortex-project.yaml" because this agent is created from SQL, not tracked in a workspace).
    After creating it, tell the attendee to chat with the
-   agent in **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE -> agent playground** (not in
-   CoCo Desktop). To pin a specific model, open the agent in Snowsight,
+   agent in **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE**, using the chat panel on the
+   detail page (the agent playground; newer UI labels it **Preview**), not in CoCo Desktop.
+   They do NOT need to **Publish** (that is only for sharing a UI-edited version; the agent
+   already exists from SQL). To pin a specific model, open the agent in Snowsight,
    click **Edit**, select the **Orchestration** section, and choose from the **Orchestration
    model** dropdown (it only appears after Edit); or re-run CREATE OR REPLACE AGENT with a
    different `models.orchestration`. If pinning, `claude-sonnet-4-5` is a good pick where

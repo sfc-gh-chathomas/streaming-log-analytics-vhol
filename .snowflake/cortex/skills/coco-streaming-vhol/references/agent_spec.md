@@ -134,9 +134,12 @@ symptom, and the suspected cause."
 ## Where to chat with the agent
 
 CoCo creates the agent object in Snowflake, but the attendee talks to it in Snowsight,
-not in CoCo Desktop. Tell them: **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE ->
-agent playground**. That playground is where they ask the demo questions below. (The
-Snowflake Intelligence chat app also works but needs extra `SNOWFLAKE_INTELLIGENCE`
+not in CoCo Desktop. Tell them: **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE**, then ask
+the demo questions in the chat panel on the agent's detail page (the **agent playground**;
+newer UI versions label this panel **Preview**). They do NOT need to **Publish**: Publish only
+applies when you edit the agent in the UI and want to share that version, and CoCo already
+created the agent from SQL, so chatting via the Preview/playground panel is all the lab needs.
+(The Snowflake Intelligence chat app also works but needs extra `SNOWFLAKE_INTELLIGENCE`
 database setup, so the Agents playground is the simplest path for the lab.)
 
 ## Model note

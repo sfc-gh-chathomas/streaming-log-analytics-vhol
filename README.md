@@ -257,8 +257,11 @@ Cortex-powered root-cause summarizer:
 > service into a plain-English incident note using Cortex.
 
 CoCo builds the agent **object** in Snowflake (it creates a helper procedure and the
-`SNOWMART_SRE` agent). To actually **talk** to it, go to **Snowsight → AI & ML → Agents**,
-click **SNOWMART_SRE**, and use the **agent playground** on its detail page. Traffic is still
+`SNOWMART_SRE` agent). To actually **talk** to it, go to **Snowsight → AI & ML → Agents** and
+click **SNOWMART_SRE**. Ask your questions in the chat panel on its detail page (the agent
+playground; some versions label it **Preview**). You do **not** need to **Publish** for this
+lab: Publish only matters if you edit the agent in the UI and want to share that version.
+CoCo already created the agent, so just chat with it. Traffic is still
 healthy here, so ask one baseline question to confirm the agent can read the live stream and
 speak in service terms:
 > In the last 5 minutes, what is the error rate and p95 latency for each service?
@@ -276,10 +279,8 @@ model for Agent"). To pin a specific model instead: in Snowsight go to **AI & ML
 Agents**, open **SNOWMART_SRE**, click **Edit**, select the **Orchestration** section, and
 choose from the **Orchestration model** dropdown (that dropdown is the authoritative
 per-account list of allowed agent models), then **Save**. The Orchestration section only
-appears after you click Edit. If you pin one, `claude-sonnet-4-5` is a good choice where it is
-offered; note the id is `claude-sonnet-4-5`, not `claude-4-sonnet` (that string is what
-triggers the "not an allowed model" error). If a pinned model is rejected, switch back to
-`auto`.
+appears after you click Edit. If you pin one, `claude-sonnet-4-5` works well where it is
+offered; switch back to `auto` if a pinned model is rejected.
 
 The agent is built and reading live data. It has nothing dramatic to report yet, and that is
 the point: you will hand it a real incident in Part 7 and watch it earn its keep.
