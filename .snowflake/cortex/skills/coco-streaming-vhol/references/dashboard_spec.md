@@ -101,8 +101,12 @@ The reference implementation is in the repo at `dashboard/streamlit_app.py`.
 This is a Streamlit in Snowflake app: there is no `snow` CLI step and no local server. Write
 `dashboard/streamlit_app.py`, then deploy it inside the account one of two ways:
 
-- **SQL:** `CREATE STREAMLIT` (or `CREATE OR REPLACE STREAMLIT`) in `STREAMING_HOL.LOGS`
-  with `QUERY_WAREHOUSE = HOL_WH`, pointing at the app file on a stage.
+- **SQL over the connection (what CoCo can do directly):** `CREATE STAGE` in
+  `STREAMING_HOL.LOGS`, `PUT file://.../dashboard/streamlit_app.py @<stage>` (the Snowflake
+  Python connector supports PUT, so this works over CoCo's SQL connection), then
+  `CREATE OR REPLACE STREAMLIT STREAMING_HOL.LOGS.<name> FROM '@<stage>'
+  MAIN_FILE='streamlit_app.py' QUERY_WAREHOUSE=HOL_WH`. Note the syntax is `FROM '@stage'`
+  with `MAIN_FILE`, not `ROOT_LOCATION`.
 - **Snowsight UI:** Projects -> Streamlit -> **+ Streamlit App**, choose `STREAMING_HOL.LOGS`
   and warehouse `HOL_WH`, and paste the file contents.
 

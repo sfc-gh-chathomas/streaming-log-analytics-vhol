@@ -171,10 +171,12 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
    rejected.
 6. **Dashboard** — build the Streamlit app (see references/dashboard_spec.md). This is a
    Streamlit in Snowflake app: NO `snow` CLI and no local server. Write
-   `dashboard/streamlit_app.py`, then either create it via `CREATE STREAMLIT` in
-   `STREAMING_HOL.LOGS` on `HOL_WH`, or tell the attendee to make it in Snowsight ->
-   Projects -> Streamlit -> + Streamlit App and paste the file. It uses
-   `get_active_session()` and runs on the warehouse.
+   `dashboard/streamlit_app.py`, then deploy it over the SQL connection: `CREATE STAGE` in
+   `STREAMING_HOL.LOGS`, `PUT` the file to the stage (the connector supports PUT), and
+   `CREATE OR REPLACE STREAMLIT ... FROM '@<stage>' MAIN_FILE='streamlit_app.py'
+   QUERY_WAREHOUSE=HOL_WH` (syntax is `FROM '@stage'` + `MAIN_FILE`, not `ROOT_LOCATION`).
+   Or tell the attendee to make it in Snowsight -> Projects -> Streamlit -> + Streamlit App
+   and paste the file. It uses `get_active_session()` and runs on the warehouse.
 
 ## Checkpoints
 

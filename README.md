@@ -284,11 +284,12 @@ becomes honest and visible:
 > SERVICE_HEALTH_SERVING with the worst service highlighted. Auto-refresh every 5 seconds.
 
 This is a **Streamlit in Snowflake** app, so there is no separate server to run and **no
-Snowflake CLI needed**. CoCo writes `dashboard/streamlit_app.py`; deploy it inside your
-account in either way: in **Snowsight → Projects → Streamlit → + Streamlit App** (pick
-`STREAMING_HOL.LOGS` and warehouse `HOL_WH`, then paste the file), or let CoCo create it with
-a `CREATE STREAMLIT` statement. It runs on Snowflake's warehouse and reads the tables directly
-through `get_active_session()`.
+Snowflake CLI needed**. CoCo writes `dashboard/streamlit_app.py`, then deploys it over your
+SQL connection: create a stage, `PUT` the file to it, and `CREATE STREAMLIT ... FROM '@<stage>'
+MAIN_FILE='streamlit_app.py' QUERY_WAREHOUSE=HOL_WH`. If you'd rather do it by hand, use
+**Snowsight → Projects → Streamlit → + Streamlit App** (pick `STREAMING_HOL.LOGS` and
+warehouse `HOL_WH`, then paste the file). Either way it runs on the warehouse and reads the
+tables through `get_active_session()`.
 
 **Checkpoint:** the freshness meter shows Bronze at a few seconds (Snowpipe Streaming) while
 Silver/Gold/Serving sit near a minute (the Dynamic Table target lag you chose). That contrast
