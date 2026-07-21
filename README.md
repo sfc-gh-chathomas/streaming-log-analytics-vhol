@@ -271,10 +271,12 @@ from an earlier answer (the baseline worst is usually recommendation-service), r
 the recent window or start a new conversation so it recomputes against the live data.
 
 **Model note.** The agent has its own brain, set separately from CoCo's model picker (the
-model at the top of CoCo builds the lab; it is not the agent). We default the agent to
-`claude-4-sonnet`. To use a newer model like Sonnet 5, open the agent in Snowsight →
-**Orchestration → Orchestration model** and pick whatever your account lists there; that
-dropdown is the authoritative per-account list.
+model at the top of CoCo builds the lab; it is not the agent). We set the agent's
+orchestration model to `auto` so Snowflake picks a model that's allowed for agents in your
+account (not every model is; pinning one like `claude-4-sonnet` can fail with "not an allowed
+model for Agent"). To pin a specific model such as Sonnet 5, open the agent in Snowsight →
+**Orchestration → Orchestration model** and pick from the dropdown; that dropdown is the
+authoritative per-account list of allowed agent models.
 
 You just went from paged to a written incident hypothesis in a few questions, on data about
 a minute old, without writing a single query.

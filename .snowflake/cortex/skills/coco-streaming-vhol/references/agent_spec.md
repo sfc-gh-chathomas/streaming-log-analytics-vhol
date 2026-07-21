@@ -62,7 +62,7 @@ CREATE OR REPLACE AGENT STREAMING_HOL.LOGS.SNOWMART_SRE
   COMMENT = 'On-call SRE co-pilot for Snowmart service health'
 FROM SPECIFICATION $spec$
 {
-  "models": { "orchestration": "claude-4-sonnet" },
+  "models": { "orchestration": "auto" },
   "instructions": {
     "response": "You are an on-call SRE co-pilot for Snowmart, a consumer shopping app. Answer questions about service health using the service_health tool over the semantic view. IMPORTANT: every time you are asked which service is worst, highest, or degrading, recompute it fresh from the most recent window (default the last 5 minutes) using the service_health tool. Do NOT reuse a service named earlier in the conversation, because conditions change minute to minute and the worst service can shift. When a service is degrading, call summarize_service_incident for that specific service to explain the likely root cause from its recent error logs. Be concise and lead with the affected service, the symptom, and the suspected cause."
   },
@@ -139,18 +139,20 @@ database setup, so the Agents playground is the simplest path for the lab.)
 - The agent's orchestration model is separate from the CoCo Desktop model picker. The
   model at the top of CoCo is what builds the lab; it is not the agent's brain. The
   agent's model is set in `models.orchestration` in the spec above.
-- We default the agent (and the summarization procedure's `COMPLETE` call) to
-  `claude-4-sonnet`, which is broadly available and matches Snowflake's own docs default.
-- To use a newer model such as Sonnet 5, either set `models.orchestration` to that
-  model name in the spec, or open the agent in Snowsight -> **Orchestration ->
-  Orchestration model** and pick from the dropdown. That dropdown is the authoritative,
-  per-account/region list of orchestration models (its names can differ from CoCo's
-  picker, so trust the dropdown).
-- Quick access check in a worksheet:
-  `SELECT SNOWFLAKE.CORTEX.COMPLETE('claude-4-sonnet', 'hi');` If it returns text, the
-  account can use that model. If no Claude model is available in-region, enable
-  cross-region inference once (`ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';`)
-  or use `openai-gpt-5`.
+- **Agent orchestration uses a restricted, account-specific allowed-models list that is
+  narrower than Cortex COMPLETE.** Pinning a model that is not on it (for example
+  `claude-4-sonnet`) fails with "X is not an allowed model for Agent". So set
+  `models.orchestration` to `"auto"` and let Snowflake choose an allowed model. To pin a
+  specific one such as Sonnet 5, open the agent in Snowsight -> **Orchestration ->
+  Orchestration model** and pick from the dropdown; that dropdown is the authoritative
+  per-account list of allowed agent models.
+- **The summarization procedure's `COMPLETE` call is a different check** with its own
+  allowed-models list. It needs a concrete model literal (COMPLETE does not accept `auto`).
+  Use a model the account offers. Quick check in a worksheet:
+  `SELECT SNOWFLAKE.CORTEX.COMPLETE('<model>', 'hi');` If it returns text, that model works;
+  swap the literal in the `SUMMARIZE_SERVICE_INCIDENT` procedure to match. If no Claude model
+  is available in-region, enable cross-region inference once
+  (`ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';`) or use `openai-gpt-5`.
 
 ## Pick the worst service automatically
 
