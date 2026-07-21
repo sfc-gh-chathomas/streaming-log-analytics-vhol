@@ -1,10 +1,10 @@
 # Power AI Agents with Continuous Streaming Data Pipelines
 
 Virtual Hands-On Lab. You build a real-time log analytics pipeline for **Snowmart**, a
-consumer shopping app: stream service logs into Snowflake with Snowpipe Streaming,
-refine them with Dynamic Tables, serve them low-latency, and put an AI SRE co-pilot
-and a live dashboard on top. You build it by prompting CoCo (Cortex Code), not by
-pasting SQL.
+consumer shopping app, on top of **Snowpipe Streaming**: stream service logs into Snowflake in
+real time, then refine them with Dynamic Tables, serve them low-latency, and put an AI SRE
+co-pilot and a live dashboard on the live data. Streaming ingestion is the engine underneath
+it all. You build it by prompting CoCo (Cortex Code), not by pasting SQL.
 
 ## What you need
 
