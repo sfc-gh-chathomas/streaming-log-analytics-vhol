@@ -180,11 +180,13 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
 
 ## Checkpoints
 
-- **B (bronze freshness):**
-  `SELECT PAYLOAD, DATEDIFF('second', TO_TIMESTAMP_TZ(PAYLOAD:ts::string), CURRENT_TIMESTAMP()) AS seconds_ago FROM BRONZE_LOGS ORDER BY TO_TIMESTAMP_TZ(PAYLOAD:ts::string) DESC LIMIT 10;`
-  Show the raw JSON `PAYLOAD` column (not parsed fields) so the room sees raw logs landing,
-  plus `seconds_ago`. Expect rows landing within seconds. (Uses the payload event time, which
-  measures true produce-to-queryable latency.)
+- **B (bronze ingest):** show volume, then one raw sample:
+  `SELECT COUNT(*) AS rows_ingested FROM BRONZE_LOGS;`
+  and
+  `SELECT PAYLOAD, DATEDIFF('second', TO_TIMESTAMP_TZ(PAYLOAD:ts::string), CURRENT_TIMESTAMP()) AS seconds_ago FROM BRONZE_LOGS ORDER BY TO_TIMESTAMP_TZ(PAYLOAD:ts::string) DESC LIMIT 1;`
+  The count climbs on re-run (streaming is live); show the raw JSON `PAYLOAD` (not parsed
+  fields) so the room sees a real streamed record. `seconds_ago` stays in single digits
+  (produce-to-queryable latency, from the payload event time).
 - **S (silver):** `SELECT COUNT(*), COUNT(DISTINCT event_id) FROM SILVER_LOGS;`
   Counts equal (deduped); no HEARTBEAT rows.
 - **G (gold):** `SELECT * FROM GOLD_SERVICE_HEALTH ORDER BY minute_bucket DESC LIMIT 20;`

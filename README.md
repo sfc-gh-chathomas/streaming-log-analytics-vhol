@@ -193,10 +193,11 @@ the background so data keeps landing while you build the next layers:
 > .venv interpreter you created for my OS): run producer/log_data_producer.py with
 > --profile producer/profile.json --rps 200.
 
-Then see how fresh it is:
-> Show me the newest raw rows landing in BRONZE_LOGS (the raw JSON payload) and how many seconds ago each arrived.
+Then confirm it's flowing:
+> Show me how many rows we have ingested into BRONZE_LOGS, and show me an example JSON payload that is streaming in.
 
-**Checkpoint:** rows land within a few seconds (producer to queryable in about 5s). That is
+**Checkpoint:** the row count climbs each time you re-run it, and the payload is the raw JSON
+the producer just streamed. Rows are queryable within seconds of being produced. That is
 Snowpipe Streaming on flat, ingest-based pricing.
 
 ### Part 2: Silver, clean the stream
