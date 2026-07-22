@@ -175,12 +175,10 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
    agent in **Snowsight -> AI & ML -> Agents -> SNOWMART_SRE**, using the chat panel on the
    detail page (the agent playground; newer UI labels it **Preview**), not in CoCo Desktop.
    They do NOT need to **Publish** (that is only for sharing a UI-edited version; the agent
-   already exists from SQL). To pin a specific model, open the agent in Snowsight,
-   click **Edit**, select the **Orchestration** section, and choose from the **Orchestration
-   model** dropdown (it only appears after Edit); or re-run CREATE OR REPLACE AGENT with a
-   different `models.orchestration`. If pinning, `claude-sonnet-4-5` is a good pick where
-   offered (mind the id: `claude-sonnet-4-5`, NOT `claude-4-sonnet`); fall back to `auto` if
-   rejected.
+   already exists from SQL). To pin a specific model, open the agent in Snowsight and set it
+   under **Configuration -> Model**; or re-run CREATE OR REPLACE AGENT with a different
+   `models.orchestration`. If pinning, `claude-sonnet-4-5` is a good pick where offered
+   (mind the id: `claude-sonnet-4-5`, NOT `claude-4-sonnet`); fall back to `auto` if rejected.
 6. **Dashboard** — build the Streamlit app (see references/dashboard_spec.md). This is a
    Streamlit in Snowflake app: NO `snow` CLI and no local server. Write
    `dashboard/streamlit_app.py`, then deploy it over the SQL connection: `CREATE STAGE` in

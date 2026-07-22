@@ -276,8 +276,7 @@ is live.
 **Model note.** The agent has its own model, separate from CoCo's picker at the top of the
 window (that one builds the lab, not the agent). We leave the agent's orchestration model on
 `auto` so Snowflake picks one that's allowed in your account. To pin a model instead, open the
-agent in Snowsight, click **Edit → Orchestration**, and choose from the dropdown (for example
-`claude-sonnet-4-5`).
+agent in Snowsight and set it under **Configuration → Model** (for example `claude-sonnet-4-5`).
 
 ### Part 6: Real-time dashboard
 
