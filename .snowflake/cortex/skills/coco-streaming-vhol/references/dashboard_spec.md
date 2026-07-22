@@ -68,22 +68,31 @@ runtime. Generate version-safe code:
   SiS; it raises `TypeError: ... got an unexpected keyword argument 'hide_index'`). Use
   `st.dataframe(df, use_container_width=True)` instead.
 - **No `st.divider()`** (also 1.23+). Use `st.markdown("---")` for a separator.
-- **Auto-refresh with a server-side rerun, not a full-page reload.** Render all panels,
-  then `time.sleep(refresh_s)` and re-run the script server-side. This updates the panels
-  in place (a small "Running" indicator) instead of the jarring browser reload +
-  "Please wait" screen clear that an HTML meta refresh (`<meta http-equiv="refresh">`)
-  causes. Do NOT use a meta refresh, and do NOT use `st.autorefresh` (not a real API).
-  Rerun call: `st.rerun()` on newer runtimes, `st.experimental_rerun()` on older ones,
-  so resolve it defensively:
+- **Auto-refresh in place with a fragment, NOT a full-page rerun.** Put all the live panels in
+  one function and refresh only that function on a timer, so the charts and tables update in
+  place. A whole-page `st.rerun()` (or a meta refresh) re-lays-out the entire app every tick:
+  it flashes a green "Running" status and makes the charts and tables **bounce/reflow**, which
+  looks broken during a demo. Prefer `st.fragment(run_every=refresh_s)`; it reruns only the
+  fragment, leaving the title and sidebar static and skipping the full-page reflow. Resolve it
+  defensively so it also works on older SiS runtimes (`experimental_fragment`), and fall back
+  to a sleep + rerun loop only if no fragment API exists:
   ```python
-  time.sleep(refresh_s)
-  _rerun = getattr(st, "rerun", None) or getattr(st, "experimental_rerun", None)
-  if _rerun:
-      _rerun()
+  def render_dashboard():
+      ...  # freshness metrics + Gold + Silver + Bronze panels
+
+  _fragment = getattr(st, "fragment", None) or getattr(st, "experimental_fragment", None)
+  if _fragment:
+      _fragment(run_every=refresh_s)(render_dashboard)()   # in-place refresh, no bounce
+  else:
+      render_dashboard()
+      time.sleep(refresh_s)
+      _rerun = getattr(st, "rerun", None) or getattr(st, "experimental_rerun", None)
+      if _rerun:
+          _rerun()
   ```
-- If the SiS app runs Streamlit >= 1.37, `@st.fragment(run_every=refresh_s)` around the
-  data panels is even smoother (partial, non-blocking refresh), but only use it when you
-  know the runtime supports it, or it raises `AttributeError`.
+  Do NOT use an HTML meta refresh (`<meta http-equiv="refresh">`) and do NOT use `st.autorefresh`
+  (not a real API). Keep the title, sidebar slider, and `st.set_page_config` OUTSIDE the
+  fragment so only the data panels update.
 
 ## Prompt to build it
 
