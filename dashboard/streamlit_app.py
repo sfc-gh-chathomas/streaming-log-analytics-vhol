@@ -51,11 +51,16 @@ def q(sql):
 
 @st.cache_data(ttl=3)
 def freshness():
+    # event_ts / minute_bucket are tz-naive TIMESTAMP_NTZ holding UTC instants, so we
+    # compare them against SYSDATE() (always UTC) — NOT CURRENT_TIMESTAMP(), which renders
+    # in the session/account timezone and yields wrong (often negative) lag on non-UTC
+    # accounts. Bronze uses EVENT_TS (TIMESTAMP_TZ, an absolute instant), so it pairs
+    # correctly with CURRENT_TIMESTAMP().
     return q(f"""
         SELECT 'bronze'  AS layer, 1 AS ord, DATEDIFF('second', MAX({EVENT_TS}),     CURRENT_TIMESTAMP()) AS lag_s FROM {BRONZE}
-        UNION ALL SELECT 'silver',  2, DATEDIFF('second', MAX(event_ts),     CURRENT_TIMESTAMP()) FROM {SILVER}
-        UNION ALL SELECT 'gold',    3, DATEDIFF('second', MAX(minute_bucket), CURRENT_TIMESTAMP()) FROM {GOLD}
-        UNION ALL SELECT 'serving', 4, DATEDIFF('second', MAX(minute_bucket), CURRENT_TIMESTAMP()) FROM {SERVING}
+        UNION ALL SELECT 'silver',  2, DATEDIFF('second', MAX(event_ts),     SYSDATE()) FROM {SILVER}
+        UNION ALL SELECT 'gold',    3, DATEDIFF('second', MAX(minute_bucket), SYSDATE()) FROM {GOLD}
+        UNION ALL SELECT 'serving', 4, DATEDIFF('second', MAX(minute_bucket), SYSDATE()) FROM {SERVING}
         ORDER BY ord
     """)
 
@@ -65,7 +70,7 @@ def health():
     return q(f"""
         SELECT service, minute_bucket, request_count, error_count, error_rate, p95_latency_ms
         FROM {SERVING}
-        WHERE minute_bucket >= DATEADD('minute', -{LOOKBACK_MIN}, CURRENT_TIMESTAMP())
+        WHERE minute_bucket >= DATEADD('minute', -{LOOKBACK_MIN}, SYSDATE())
         ORDER BY minute_bucket
     """)
 
@@ -83,7 +88,7 @@ def silver_stats():
         s AS (
             SELECT COUNT(*) AS clean_rows
             FROM {SILVER}
-            WHERE event_ts > DATEADD('minute', -{WINDOW_MIN}, CURRENT_TIMESTAMP())
+            WHERE event_ts > DATEADD('minute', -{WINDOW_MIN}, SYSDATE())
         )
         SELECT b.raw_rows, b.heartbeats, s.clean_rows FROM b, s
     """)
