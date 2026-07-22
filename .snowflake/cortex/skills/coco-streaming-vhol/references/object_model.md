@@ -110,3 +110,20 @@ CREATE OR REPLACE SEMANTIC VIEW SERVICE_HEALTH_SV
   )
   COMMENT = 'Snowmart service health for the real-time SRE co-pilot';
 ```
+
+**Emit this DDL verbatim** (change only synonyms/comments). Semantic-view syntax is strict and
+easy to get wrong; the exact rules and the common mistakes:
+
+- Clause order is fixed: `TABLES` -> `FACTS` -> `DIMENSIONS` -> `METRICS`.
+- Table alias uses `AS`. Facts/dimensions are `alias.column AS name`, then optional
+  `WITH SYNONYMS = (...)` and `COMMENT = '...'`. Metrics are `alias.metric_name AS AGG(alias.column)`.
+
+| Wrong (fails) | Right |
+| --- | --- |
+| `health = GOLD_SERVICE_HEALTH` | `health AS GOLD_SERVICE_HEALTH` |
+| `health.request_count SYNONYMS = (...)` | `health.request_count AS request_count WITH SYNONYMS = (...)` |
+| `total_requests = SUM(health.request_count)` | `health.total_requests AS SUM(health.request_count)` |
+
+Key points: use `AS` (not `=`) for the table and for every metric; write `WITH SYNONYMS`
+(not bare `SYNONYMS`); metric names must be alias-qualified (`health.total_requests`). If a
+create errors, re-send this exact DDL rather than improvising alternate syntax.

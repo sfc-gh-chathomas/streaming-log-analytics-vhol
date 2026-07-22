@@ -91,12 +91,21 @@ layer for the dashboard and agent. If Interactive Tables are unavailable in the
 region, fall back to a plain Dynamic Table with the same name and select list.
 
 ### SERVICE_HEALTH_SV (Semantic View over GOLD_SERVICE_HEALTH)
-Clause order TABLES -> FACTS -> DIMENSIONS -> METRICS.
-- Logical table `health` = GOLD_SERVICE_HEALTH, PRIMARY KEY (service, minute_bucket).
+Build it from the verbatim DDL in `references/object_model.md` (change only synonyms/comments).
+Clause order is fixed: TABLES -> FACTS -> DIMENSIONS -> METRICS.
+- Logical table `health` AS GOLD_SERVICE_HEALTH, PRIMARY KEY (service, minute_bucket).
 - Facts: request_count, error_count, error_rate, p95_latency_ms.
 - Dimensions: service (synonyms microservice/app/component), minute_bucket.
-- Metrics: total_requests=SUM(request_count), total_errors=SUM(error_count),
-  avg_error_rate=AVG(error_rate), worst_p95_latency=MAX(p95_latency_ms).
+- Metrics (alias-qualified, defined with `AS`): `health.total_requests AS SUM(health.request_count)`,
+  `health.total_errors AS SUM(health.error_count)`, `health.avg_error_rate AS AVG(health.error_rate)`,
+  `health.worst_p95_latency AS MAX(health.p95_latency_ms)`.
+
+**Semantic-view syntax rules (CoCo has generated these wrong; follow exactly):**
+- Table: `<alias> AS <table>` (use `AS`, never `<alias> = <table>`).
+- Synonyms: `WITH SYNONYMS = (...)` (never bare `SYNONYMS = (...)`).
+- Metrics: name is alias-qualified and defined with `AS`, e.g. `health.total_requests AS SUM(...)`
+  (never `total_requests = SUM(...)`).
+- If a create fails, re-emit the exact DDL from `object_model.md` rather than improvising syntax.
 
 ## Workflow
 
@@ -141,7 +150,10 @@ Follow the attendee's lead through these steps. Each maps to one prompt.
 3. **Gold** — create GOLD_SERVICE_HEALTH per the model. Checkpoint G.
 4. **Serving + semantic view** — create SERVICE_HEALTH_SERVING and SERVICE_HEALTH_SV.
    For the serving layer, load the bundled `snowflake-interactive` skill and use
-   `CREATE INTERACTIVE TABLE` (never `DYNAMIC TABLE ... IS_INTERACTIVE`).
+   `CREATE INTERACTIVE TABLE` (never `DYNAMIC TABLE ... IS_INTERACTIVE`). For the semantic
+   view, emit the verbatim DDL from `references/object_model.md` and follow its syntax rules
+   (`AS` not `=`, `WITH SYNONYMS`, alias-qualified metrics); if unsure, load the bundled
+   `semantic-view` skill rather than improvising the grammar.
 5. **Agent** — build the SRE co-pilot exactly as in `references/agent_spec.md`: first
    create the `SUMMARIZE_SERVICE_INCIDENT` procedure, then run the `CREATE OR REPLACE
    AGENT ... FROM SPECIFICATION $$ ... $$` statement as-is. Do NOT use `uv` or a
